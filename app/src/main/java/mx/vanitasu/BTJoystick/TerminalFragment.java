@@ -54,8 +54,8 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
     private long lastSendTime = 0;
     private static final long SEND_INTERVAL = 80;
 
-    private char lastDirection = 'S';
-    private int lastSpeedLevel = -1;
+    private char lastDirection = 'Q';
+    private int lastSpeedLevel = 0;
 
 
     /*
@@ -166,13 +166,13 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
 
                 char direction = 'S';
 
-                if (yPercent > 0.3f) direction = 'F';
-                else if (yPercent < -0.3f) direction = 'B';
+                if (yPercent > 0.3f) direction = 'W';
+                else if (yPercent < -0.3f) direction = 'S';
 
                 int level = (int)(Math.abs(yPercent) * 9); // 0–9
 
                 if (level < 1) {
-                    direction = 'S';
+                    direction = 'Q';
                     level = 0;
                 }
 
@@ -189,9 +189,9 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
 
             @Override
             public void onRelease() {
-                send("S");
+                send("Q");
                 send("0");
-                lastDirection = 'S';
+                lastDirection = 'Q';
                 lastSpeedLevel = 0;
             }
         });
@@ -208,15 +208,15 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
                 if (now - lastSendTime < SEND_INTERVAL) return;
                 lastSendTime = now;
 
-                char direction = 'S';
+                char direction = 'Q';
 
-                if (xPercent > 0.4f) direction = 'R';
-                else if (xPercent < -0.4f) direction = 'L';
+                if (xPercent > 0.4f) direction = 'D';
+                else if (xPercent < -0.4f) direction = 'A';
 
                 int level = (int)(Math.abs(xPercent) * 9);
 
                 if (level < 1) {
-                    direction = 'S';
+                    direction = 'Q';
                     level = 0;
                 }
 
@@ -233,15 +233,73 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
 
             @Override
             public void onRelease() {
-                send("S");
+                send("Q");
                 send("0");
-                lastDirection = 'S';
+                lastDirection = 'Q';
                 lastSpeedLevel = 0;
             }
         });
 
+        View btnIdle = view.findViewById(R.id.btn_idle);
+        btnIdle.setOnClickListener(v -> send("Z"));
+
+        View btnBluetooth = view.findViewById(R.id.btn_bluetooth);
+        btnBluetooth.setOnClickListener(v -> send("X"));
+
+
+        View btnLineFollow = view.findViewById(R.id.btn_LineFollow);
+        btnLineFollow.setOnClickListener(v -> send("C"));
+
+
+        View btnUltrasonic = view.findViewById(R.id.btn_Ultrasonic);
+        btnUltrasonic.setOnClickListener(v -> showUltrasonicOptions());
+
+
+
 
         return view;
+    }
+
+    private void showUltrasonicOptions() {
+        String[] mapTypes = {"Nuevo", "Repetir"};
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle("Tipo de Mapa");
+        builder.setItems(mapTypes, (dialog, which) -> {
+            if (which == 0) { // Nuevo - N
+                showPositionOptions();
+            } else { // Repetir - R
+                send("VR");
+            }
+        });
+        builder.show();
+    }
+
+    private void showPositionOptions() {
+        String[] positions = {"Centro", "Exterior"};
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle("Posicion Inicial");
+        builder.setItems(positions, (dialog, which) -> {
+            if (which == 0) { // Centro - I
+                send("VNI");
+            } else { // Exterior - O
+                showExteriorOptions();
+            }
+        });
+        builder.show();
+    }
+
+    private void showExteriorOptions() {
+        String[] options = {"Inferior Izquierda", "Inferior Derecha"};
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle("Posición Exterior");
+        builder.setItems(options, (dialog, which) -> {
+            if (which == 0) { // Inferior Izquierda - U
+                send("VNOU");
+            } else { // Inferior Derecha - P
+                send("VNOP");
+            }
+        });
+        builder.show();
     }
 
     @Override
