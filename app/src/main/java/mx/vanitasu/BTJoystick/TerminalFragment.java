@@ -5,6 +5,8 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -41,8 +43,6 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
     private SerialService service;
 
     private TextView receiveText;
-    private TextView sendText;
-    private TextUtil.HexWatcher hexWatcher;
 
     private Connected connected = Connected.False;
     private boolean initialStart = true;
@@ -140,18 +140,15 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
         receiveText.setTextColor(getResources().getColor(R.color.colorRecieveText)); // set as default color to reduce number of spans
         receiveText.setMovementMethod(ScrollingMovementMethod.getInstance());
 
-
-        sendText = view.findViewById(R.id.send_text);
-        hexWatcher = new TextUtil.HexWatcher(sendText);
-        hexWatcher.enable(hexEnabled);
-        sendText.addTextChangedListener(hexWatcher);
-        sendText.setHint(hexEnabled ? "HEX mode" : "");
-
-        View sendBtn = view.findViewById(R.id.send_btn);
-        sendBtn.setOnClickListener(v -> send(sendText.getText().toString()));
+        View btnReconnect = view.findViewById(R.id.btn_reconnect);
+        btnReconnect.setOnClickListener(v -> {
+            if (connected != Connected.False) disconnect();
+            connect();
+        });
 
         JoystickView joyMove = view.findViewById(R.id.joyMove);
         JoystickView joyTurn = view.findViewById(R.id.joyTurn);
+        joyTurn.setVertical(false);
 
         joyMove.setOnJoystickMoveListener(new JoystickView.OnJoystickMoveListener() {
 
@@ -254,10 +251,27 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
         View btnUltrasonic = view.findViewById(R.id.btn_Ultrasonic);
         btnUltrasonic.setOnClickListener(v -> showUltrasonicOptions());
 
-
-
+        // Cambiar el fondo de la Activity al entrar a este fragmento
+        if (getActivity() != null) {
+            View mainLayout = getActivity().findViewById(R.id.main_container);
+            if (mainLayout != null) {
+                mainLayout.setBackgroundResource(R.drawable.bluedream);
+            }
+        }
 
         return view;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        // Restaurar el fondo de Hello Kitty al salir del fragmento
+        if (getActivity() != null) {
+            View mainLayout = getActivity().findViewById(R.id.main_container);
+            if (mainLayout != null) {
+                mainLayout.setBackgroundResource(R.drawable.hellokitty);
+            }
+        }
     }
 
     private void showUltrasonicOptions() {
@@ -323,6 +337,9 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
         if (id == R.id.clear) {
             receiveText.setText("");
             return true;
+        } else if (id == R.id.copy) {
+            copyToClipboard();
+            return true;
         } else if (id == R.id.newline) {
             String[] newlineNames = getResources().getStringArray(R.array.newline_names);
             String[] newlineValues = getResources().getStringArray(R.array.newline_values);
@@ -337,9 +354,6 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
             return true;
         } else if (id == R.id.hex) {
             hexEnabled = !hexEnabled;
-            sendText.setText("");
-            hexWatcher.enable(hexEnabled);
-            sendText.setHint(hexEnabled ? "HEX mode" : "");
             item.setChecked(hexEnabled);
             return true;
         } else if (id == R.id.backgroundNotification) {
@@ -354,6 +368,19 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
         } else {
             return super.onOptionsItemSelected(item);
         }
+    }
+
+    private void copyToClipboard() {
+        if (getActivity() == null) return;
+        String text = receiveText.getText().toString();
+        if (text.isEmpty()) {
+            Toast.makeText(getActivity(), "Terminal is empty", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        ClipboardManager clipboard = (ClipboardManager) getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
+        ClipData clip = ClipData.newPlainText("Terminal Log", text);
+        clipboard.setPrimaryClip(clip);
+        Toast.makeText(getActivity(), "Copied to clipboard", Toast.LENGTH_SHORT).show();
     }
 
     /*

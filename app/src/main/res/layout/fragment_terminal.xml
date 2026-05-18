@@ -14,33 +14,43 @@
         android:freezesText="true"
         android:gravity="bottom"
         android:scrollbars="vertical"
+        android:background="@drawable/hellokitty"
+        android:textColor="@color/black"
+        android:padding="8dp"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
 
     <View
         android:layout_width="match_parent"
-        android:background="?android:attr/listDivider"
+        android:background="#F06292"
         android:layout_height="2dp" />
 
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:padding="4dp"
+        android:gravity="center">
 
-        <EditText
-            android:id="@+id/send_text"
+        <Button
+            android:id="@+id/btn_idle"
             android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:inputType="text|textNoSuggestions"
-            android:singleLine="true" />
+            android:layout_margin="2dp"
+            android:background="@drawable/btn_pink"
+            android:textColor="@color/white"
+            android:text="IDLE" />
 
-        <ImageButton
-            android:id="@+id/send_btn"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            app:srcCompat="@drawable/ic_send_white_24dp" />
-
+        <Button
+            android:id="@+id/btn_reconnect"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_margin="2dp"
+            android:background="@drawable/btn_pink"
+            android:textColor="@color/white"
+            android:text="Reconectar" />
 
     </LinearLayout>
 
@@ -48,32 +58,38 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-
-        android:textAlignment="center">
-
-        <Button
-            android:text="IDLE"
-            android:id="@+id/btn_idle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+        android:padding="4dp"
+        android:gravity="center">
 
         <Button
             android:text="Bluetooth"
             android:id="@+id/btn_bluetooth"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_margin="2dp"
+            android:background="@drawable/btn_pink"
+            android:textColor="@color/white" />
 
         <Button
             android:text="LineFollow"
             android:id="@+id/btn_LineFollow"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_margin="2dp"
+            android:background="@drawable/btn_pink"
+            android:textColor="@color/white" />
 
         <Button
             android:text="Laberynth"
             android:id="@+id/btn_Ultrasonic"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_margin="2dp"
+            android:background="@drawable/btn_pink"
+            android:textColor="@color/white" />
 
 
     </LinearLayout>
@@ -82,18 +98,20 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:paddingBottom="16dp">
 
         <mx.vanitasu.BTJoystick.JoystickView
             android:id="@+id/joyMove"
-            android:layout_width="200dp"
-            android:layout_height="200dp"
+            android:layout_width="180dp"
+            android:layout_height="180dp"
             tools:ignore="TextSizeCheck"/>
 
         <mx.vanitasu.BTJoystick.JoystickView
             android:id="@+id/joyTurn"
-            android:layout_width="200dp"
-            android:layout_height="200dp"
+            android:layout_width="180dp"
+            android:layout_height="180dp"
             tools:ignore="TextSizeCheck" />
 
     </LinearLayout>
